@@ -1,5 +1,5 @@
-/_build
-/cover
-/deps
-erl_crash.dump
-*.ez
+/temp/
+/vendor/
+/tests/output
+/tests/support/_generated
+/.tmp_staging/
