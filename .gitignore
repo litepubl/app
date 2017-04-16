@@ -3,3 +3,4 @@
 /tests/output
 /tests/support/_generated
 /.tmp_staging/
+/composer.lock

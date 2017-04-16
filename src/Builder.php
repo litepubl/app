@@ -2,15 +2,15 @@
 
 namespace litepubl\core\app\App;
 
-class Factory
+class Builder
 {
     protected $config;
 
     public static function run()
     {
         $config = new Config();
-        $factory = new self($config);
-        $app = $factory->create();
+        $builder = new self($config);
+        $app = $builder->createApp();
         $app->run();
     }
 
@@ -19,7 +19,7 @@ class Factory
         $this->config = $config;
     }
 
-    public function create(): App
+    public function createApp(): App
     {
         $app = new App();
         return $app;
