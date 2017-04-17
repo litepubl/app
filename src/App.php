@@ -3,13 +3,15 @@
 namespace litepubl\core\app\App;
 
 use litepubl\core\storage\StorageInterface;
+use litepubl\core\storage\PoolInterface;
+use litepubl\core\storage\FactoryInterface as StorageFactory;
+use litepubl\core\logmanager\FactoryInterface as LogFactory;
 
-class App
+class App implements StorageFactory, LogFactory
 {
-    use Callbacks;
-
     protected $cache;
-    protected $classes;
+    protected $callbacks;
+    protected $container;
     protected $db;
     protected $installed;
     protected $logFactory;
@@ -17,16 +19,22 @@ class App
     protected $microtime;
     protected $options;
     protected $paths;
-    protected $poolStorage;
+    protected $pool;
     protected $router;
     protected $site;
     protected $storage;
 
-    public function __construct(StorageInterface $storage, StorageInterface $pool)
+    public function __construct(Factory $factory)
     {
-        $this->storage = $storage;
-        $this->pool = $pool;
-        $this->cache = $cache;
+        $this->paths = $factory->createPaths();
+        $this->logFactory = $factory->createLogFactory();
+        $this->storage = $factory->createStorage();
+        $this->pool = $factory->createPool();
+    }
+
+    public function getPaths(): Paths
+    {
+        return $this->paths;
     }
 
     public function getStorage(): StorageInterface
@@ -34,8 +42,18 @@ class App
         return $this->storage;
     }
 
-    public function getPool(): StorageInterface
+    public function getPool(): PoolInterface
     {
         return $this->pool;
+    }
+
+    public function getLogFactory(): LogFactory
+    {
+        return $this->logFactory;
+    }
+
+    public function getLogManager(): LogManagerInterface
+    {
+        return $this->logFactory->getLogManager();
     }
 }
