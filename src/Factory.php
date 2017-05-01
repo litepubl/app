@@ -76,30 +76,34 @@ class Factory implements ContainerInterface
 
     public function createContainer(): ContainerInterface
     {
-        $factory = new Composite(
-            [
+        $configurableFactory = new ConfigurableFactory();
+        $factories = [
+        $configurableFactory,
             new Items($this->config['factories']),
-            new Items($this->defaultConfig['factories']),
             new Items($this->defaultConfig['factories']),
             $this,
             new NameSpaceFactory(),
-            ]
-        );
+            ];
 
-        $remap = new Composite(
-            [
+        $remap = [
             new items($this->config['implementations']),
             new items($this->defaultConfig['implementations']),
-            ]
-        );
+            ];
 
         $DI = new DI();
-        return new Instances($factories, $remap, $DI, $events);
+        $result = new Instances(new Composite(... $factories), new Composite(... $remap), $DI, $events);
+
+        $storage = $result->get(PoolInterface::class);
+        $configurableFactory->setStorage($storage);
+        $configurableFactory->load();
+
+        return $result;
     }
 
     public function createStorage(): StorageInterface
     {
-        $path = ltrim($this->paths->data, '\/'). '/';
+        $paths = $this->container->get(Paths::class);
+        $path = ltrim($paths->data, '\/'). '/';
         return new Storage(new Php(), $this->logFactory, $path);
     }
 
