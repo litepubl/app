@@ -2,7 +2,8 @@
 
 namespace litepubl\core\app;
 
-use Psr\Container\ContainerInterface;
+use Psr\Container\ContainerInterface as PsrContainer;
+use litepubl\core\container\ContainerInterface;
 use litepubl\core\storage\StorageInterface;
 use litepubl\core\storage\PoolInterface;
 use litepubl\core\storage\FactoryInterface as StorageFactory;
@@ -12,13 +13,16 @@ class App implements StorageFactory, LogFactory
 {
     protected $container;
     protected $callbacks;
-    protected $installed;
     protected $memcache;
+    protected $debug;
     protected $microtime;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(containerInterface $container)
     {
-        $this->container = $container;
+        $container->set($this, 'app');
+        $this->container= $container;
+        $this->microtime = microtime(true);
+        $this->debug = false;
     }
 
     public function getContainer(): ContainerInterface
@@ -55,6 +59,7 @@ class App implements StorageFactory, LogFactory
     {
         return $this->getLogFactory()->getLogManager();
     }
+
     public function getOptions(): Options
     {
         return $this->get(Options::class);
@@ -78,5 +83,25 @@ class App implements StorageFactory, LogFactory
     public function getRouter(): Router
     {
         return $this->get(Router::class);
+    }
+
+    public function getDebug(): bool
+    {
+        return $this->debug;
+    }
+
+    public function setDebug(bool $value)
+    {
+        $this->debug = $value;
+    }
+
+    public function getInstalled(): bool
+    {
+        return$this->getPool()->getInstalled();
+    }
+
+    public function getMicrotime(): float
+    {
+        return $this->microtime;
     }
 }

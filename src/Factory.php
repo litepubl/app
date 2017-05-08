@@ -1,14 +1,13 @@
 <?php
-
 namespace litepubl\core\app;
 
 use Psr\Container\ContainerInterface;
-use litepubl\core\instances\Instances;
-use litepubl\core\instances\Composite;
-use litepubl\core\instances\DI;
-use litepubl\core\instances\Items;
-use litepubl\core\instances\NameSpaceFactory;
-use litepubl\core\instances\NotFound;
+use litepubl\core\container\Container;
+use litepubl\core\container\factories\Composite;
+use litepubl\core\container\DI\DI;
+use litepubl\core\container\factories\Items;
+use litepubl\core\container\factories\NameSpaceFactory;
+use litepubl\core\container\NotFound;
 use litepubl\core\storage\StorageInterface;
 use litepubl\core\storage\PoolInterface;
 use litepubl\core\storage\Storage;
@@ -17,94 +16,45 @@ use litepubl\core\storage\FileLocker;
 use litepubl\core\storage\serializer\Php;
 use litepubl\core\logfactory\Factory as LogFactory;
 use litepubl\core\logfactory\FactoryInterface as LogFactoryInterface;
+use litepubl\core\logmanager\LogManagerInterface;
 
-class Factory implements ContainerInterface
+class Factory extends Base
 {
-    protected $container;
+    const IMPLEMENTATIONS = 'implementations';
+    const FACTORIES = 'factories';
     protected $config;
     protected $defaultConfig;
 
-    const CLASSES = [
-    ContainerInterface::class,
-    Instances::class,
-    App::class,
-    Paths::class,
-    ];
-
-    public function __construct(array $config)
+    public function __construct(ContainerInterface $container, array $config, array $defaultConfig)
     {
+        $this->container = $container;
         $this->config = $config;
-        $this->defaultConfig = include __DIR__ . '/DefaultConfig.php';
-        $this->container = $this->createContainer();
+        $this->defaultConfig = $defaultConfig;
+//include __DIR__ . '/DefaultConfig.php';
     }
 
-    public function has($className)
+    protected function getClassMap(): array
     {
-        $className = ltrim($className, '\\');
-        return in_array($className, static::CLASSES);
+        return $this->defaultConfig[static::FACTORIES][$className]);
     }
 
-    public function get($className)
+    public function getImplementation(string $className): string
     {
-        $className = ltrim($className, '\\');
-        switch ($className) {
-        case ContainerInterface::class:
-        case Instances::class:
-            $result = $this->container;
-            break;
-
-        case Paths::class:
-            $result = $this->createPaths();
-            break;
-
-        case App::class:
-            $result = $this->createApp();
-            break;
-
-        default:
-            throw new NotFound(sprintf('Class "%s" not found', $className));
-        }
-
-        return $result;
+        return $this->config[static::IMPLEMENTATIONS][$className] ?? $this->defaultConfig[static::IMPLEMENTATIONS][$className] ?? '';
     }
 
     public function createApp(): App
     {
-        $appClass = $this->config[Appp::class] ?? App::class;
+        $appClass = $this->getImplementation(Appp::class);
         return new $appClass($this->container);
-    }
-
-    public function createContainer(): ContainerInterface
-    {
-        $configurableFactory = new ConfigurableFactory();
-        $factories = [
-        $configurableFactory,
-            new Items($this->config['factories']),
-            new Items($this->defaultConfig['factories']),
-            $this,
-            new NameSpaceFactory(),
-            ];
-
-        $remap = [
-            new items($this->config['implementations']),
-            new items($this->defaultConfig['implementations']),
-            ];
-
-        $DI = new DI();
-        $result = new Instances(new Composite(... $factories), new Composite(... $remap), $DI, $events);
-
-        $storage = $result->get(PoolInterface::class);
-        $configurableFactory->setStorage($storage);
-        $configurableFactory->load();
-
-        return $result;
     }
 
     public function createStorage(): StorageInterface
     {
         $paths = $this->container->get(Paths::class);
-        $path = ltrim($paths->data, '\/'). '/';
-        return new Storage(new Php(), $this->logFactory, $path);
+        $path = ltrim($paths->data, '\/') . '/';
+        $storageClass = $this->getImplementation(StorageInterface::class);
+        return new $storageClass(new Php(), $this->logFactory, $path);
     }
 
     public function createPool(string $path, StorageInterface $storage): PoolInterface
@@ -114,11 +64,9 @@ class Factory implements ContainerInterface
 
     public function createLogFactory(): LogFactoryInterface
     {
-        return new LazyLogFactory(
-            function () use ($paths, $debugMode) {
-                        $factory = new LogFactory($paths->data . 'logs/log.log', $debugMode);
-                        return $factory->getLogManager();
-            }
-        );
+        return new LazyLogFactory(function () {
+            $factory = $this->container->get(LogFactoryInterface::class);
+            return $factory->get(LogManagerInterface::class);
+        });
     }
 }
