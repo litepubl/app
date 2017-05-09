@@ -6,10 +6,9 @@ use Psr\Container\ContainerInterface as PsrContainer;
 use litepubl\core\container\ContainerInterface;
 use litepubl\core\storage\StorageInterface;
 use litepubl\core\storage\PoolInterface;
-use litepubl\core\storage\FactoryInterface as StorageFactory;
 use litepubl\core\logmanager\FactoryInterface as LogFactory;
 
-class App implements StorageFactory, LogFactory
+class App implements LogFactory
 {
     protected $container;
     protected $callbacks;
