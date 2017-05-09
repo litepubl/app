@@ -9,7 +9,7 @@ return [
 Psr\Container\ContainerInterface::class => litepubl\core\container\Container,
 litepubl\core\container\ContainerInterface::class => litepubl\core\container\Container::class,
 litepubl\core\container\factories\FactoryInterface::class => litepubl\core\container\factories\Items::class,
-litepubl\core\app\AppInterface::class => litepubl\core\app\App::class,
+
 //DI
 litepubl\core\container\DI\DIInterface::class => litepubl\core\container\DI\DI::class,
 litepubl\core\container\DI\ArgsInterface::class => litepubl\core\options\DIArgs::class,
@@ -34,6 +34,7 @@ litepubl\core\container\Container::class => ContainerFactory::class,
 litepubl\core\container\DI\DI::class => ContainerFactory,
 litepubl\core\options\DIArgs::class => ContainerFactory,
 litepubl\core\options\DICache::class => ContainerFactory,
+litepubl\core\options\Factories::class => ContainerFactory,
 
 ],
 
