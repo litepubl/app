@@ -9,6 +9,7 @@ return [
 Psr\Container\ContainerInterface::class => litepubl\core\container\Container,
 litepubl\core\container\ContainerInterface::class => litepubl\core\container\Container::class,
 litepubl\core\container\factories\FactoryInterface::class => litepubl\core\container\factories\Items::class,
+litepubl\core\container\EventsInterface::class => litepubl\core\options\ContainerEvents::class,
 
 //DI
 litepubl\core\container\DI\DIInterface::class => litepubl\core\container\DI\DI::class,
@@ -32,6 +33,7 @@ litepubl\core\logmanager\FactoryInterface::class => litepubl\core\logmanager\Laz
 //app
 litepubl\core\app\App::class => ContainerFactory::class,
 litepubl\core\container\Container::class => ContainerFactory::class,
+litepubl\core\options\ContainerEvents::class => ContainerFactory::class,
 
 //DI
 litepubl\core\container\DI\DI::class => ContainerFactory::class,
@@ -51,7 +53,6 @@ litepubl\core\storage\serializer\Serialize::class => StorageFactory::class,
 //logger
 litepubl\core\logmanager\LazyFactory::class => StorageFactory::class,
 litepubl\core\logfactory\Manager::class => litepubl\core\logfactory\Factory::class,
-
 
 ],
 

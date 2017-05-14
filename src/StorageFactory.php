@@ -13,17 +13,22 @@ use litepubl\core\storage\serializer\SerializerInterface;
 use litepubl\core\storage\serializer\Php;
 use litepubl\core\storage\serializer\JSon;
 use litepubl\core\storage\serializer\Serialize;
-use litepubl\core\logfactory\Factory as LogFactory;
-use litepubl\core\logfactory\FactoryInterface as LogFactoryInterface;
+use litepubl\core\logmanager\FactoryInterface as LogFactoryInterface;
 use litepubl\core\logmanager\LogManagerInterface;
-use litepubl\core\logmanager\LazyFactory;
+use litepubl\core\logmanager\LazyFactory as LogLazyFactory;
 
 class StorageFactory extends Base
 {
-    public $fileLockerName = 'storage.lok';
-    protected function getClassMap(): array
-    {
-        return [
+    protected $fileLockerName = 'storage.lok';
+    protected $implementations = [
+    StorageInterface::class => Storage::class,
+    PoolInterface::class => Pool::class,
+    LockerInterface::class => FileLocker::class,
+    SerializerInterface::class => Php::class,
+    LogFactoryInterface::class => LogLazyFactory::class,
+    ];
+
+    protected $classMap = [
         Paths::class => 'createPaths',
         Storage::class => 'createStorage',
         Pool::class => 'createPool',
@@ -31,10 +36,8 @@ class StorageFactory extends Base
         JSon::class => 'createJSon',
         Serialize::class => 'createSerialize',
         FileLocker::class => 'createFileLocker',
-        LogFactory::class => 'createLogFactory',
-        LazyFactory::class => 'createLazyFactory',
+        LogLazyFactory::class => 'createLogLazyFactory',
         ];
-    }
 
     public function createStorage(): Storage
     {
@@ -75,9 +78,9 @@ class StorageFactory extends Base
         return new FileLocker($paths->data . $this->fileLockerName);
     }
 
-    public function createLazyFactory(): LazyFactory
+    public function createLogLazyFactory(): LogLazyFactory
     {
-        return new LazyLogFactory([$this, 'getLogManager']);
+        return new LogLazyFactory([$this, 'getLogManager']);
     }
 
     public function getLogManager(): LogManagerInterface
