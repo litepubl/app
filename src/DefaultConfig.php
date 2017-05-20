@@ -27,6 +27,8 @@ Psr\Log\LoggerInterface::class => Monolog\Logger::class,
 litepubl\core\logmanager\LogManagerInterface::class => litepubl\core\logfactory\Manager::class,
 litepubl\core\logmanager\FactoryInterface::class => litepubl\core\logmanager\LazyFactory::class,
 
+//events
+litepubl\core\events\EventManagerInterface::class => litepubl\core\events\Composite::class,
 ],
 
 'factories' => [
@@ -53,6 +55,12 @@ litepubl\core\storage\serializer\Serialize::class => StorageFactory::class,
 //logger
 litepubl\core\logmanager\LazyFactory::class => StorageFactory::class,
 litepubl\core\logfactory\Manager::class => litepubl\core\logfactory\Factory::class,
+
+//events
+litepubl\core\events\Callbacks::class => EventsFactory::class,
+litepubl\core\events\Composite::class => EventsFactory::class,
+litepubl\core\events\Events::class => EventsFactory::class,
+litepubl\core\events\GlobalEvents::class => EventsFactory::class,
 
 ],
 
