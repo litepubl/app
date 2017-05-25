@@ -15,6 +15,7 @@ litepubl\core\container\EventsInterface::class => litepubl\core\options\Containe
 litepubl\core\container\DI\DIInterface::class => litepubl\core\container\DI\DI::class,
 litepubl\core\container\DI\ArgsInterface::class => litepubl\core\options\DIArgs::class,
 litepubl\core\container\DI\CacheInterface::class => litepubl\core\options\DICache::class,
+litepubl\core\container\factories\InstallerInterface::class => litepubl\core\container\factories\NullInterface::class,
 
 //storages
 litepubl\core\storage\StorageInterface::class => litepubl\core\storage\Storage::class,
