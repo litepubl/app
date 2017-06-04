@@ -30,6 +30,9 @@ litepubl\core\logmanager\FactoryInterface::class => litepubl\core\logmanager\Laz
 
 //events
 litepubl\core\events\EventManagerInterface::class => litepubl\core\events\Composite::class,
+
+//session
+LitePubl\Core\Session\SessionInterface::class => LitePubl\Core\Session\Session::class,
 ],
 
 'factories' => [
@@ -52,10 +55,13 @@ litepubl\core\storage\FileLocker::class => StorageFactory::class,
 litepubl\core\storage\serializer\Php::class => StorageFactory::class,
 litepubl\core\storage\serializer\JSon::class => StorageFactory::class,
 litepubl\core\storage\serializer\Serialize::class => StorageFactory::class,
+\MemCache::class => StorageFactory::class,
+LitePubl\Core\Session\Session::class => StorageFactory::class,
 
 //logger
 litepubl\core\logmanager\LazyFactory::class => StorageFactory::class,
 litepubl\core\logfactory\Manager::class => litepubl\core\logfactory\Factory::class,
+
 
 //events
 litepubl\core\events\Callbacks::class => EventsFactory::class,
@@ -66,6 +72,10 @@ litepubl\core\events\GlobalEvents::class => EventsFactory::class,
 ],
 
 'args' => [
+\MemCache::class => [
+'host' => '127.0.0.1',
+ 'port' => 11211
+],
 ],
 ],
 ];

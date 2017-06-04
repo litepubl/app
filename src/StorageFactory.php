@@ -13,6 +13,9 @@ use litepubl\core\storage\serializer\SerializerInterface;
 use litepubl\core\storage\serializer\Php;
 use litepubl\core\storage\serializer\JSon;
 use litepubl\core\storage\serializer\Serialize;
+use \MemCache;
+use LitePubl\Core\Session\Session;
+use LitePubl\Core\Session\SessionInterface;
 use litepubl\core\logmanager\FactoryInterface as LogFactoryInterface;
 use litepubl\core\logmanager\LogManagerInterface;
 use litepubl\core\logmanager\LazyFactory as LogLazyFactory;
@@ -26,6 +29,7 @@ class StorageFactory extends Base
     LockerInterface::class => FileLocker::class,
     SerializerInterface::class => Php::class,
     LogFactoryInterface::class => LogLazyFactory::class,
+    SessionInterface::class => Session::class,
     ];
 
     protected $classMap = [
@@ -37,6 +41,8 @@ class StorageFactory extends Base
         Serialize::class => 'createSerialize',
         FileLocker::class => 'createFileLocker',
         LogLazyFactory::class => 'createLogLazyFactory',
+    MemCache::class => 'createMemCache',
+    Session::class => 'createSession',
         ];
 
     public function createStorage(): Storage
@@ -86,5 +92,25 @@ class StorageFactory extends Base
     public function getLogManager(): LogManagerInterface
     {
         return $this->container->get(LogManagerInterface::class);
+    }
+
+    public function createMemCache()
+    {
+        if (class_exists(MemCache::class)) {
+            $appConfig = $this->container->get('appconfig');
+            $config = $appConfig['memcache'];
+            if ($config) {
+                $result = new Memcache;
+                $result->connect($config['host'], $config['port']);
+                return $result;
+            }
+        }
+
+        return false;
+    }
+
+    public function createSession(): Session
+    {
+        return new Session($this->container);
     }
 }
