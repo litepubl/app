@@ -97,11 +97,11 @@ class StorageFactory extends Base
     public function createMemCache()
     {
         if (class_exists(MemCache::class)) {
-            $appConfig = $this->container->get('appconfig');
-            $config = $appConfig['memcache'];
-            if ($config) {
+            $config = $this->container->get(Cconfig::class);
+            $memCacheConfig = $config->config[$config::OPTIONS][MemCache::class] ?? null;
+            if ($memCacheConfig) {
                 $result = new Memcache;
-                $result->connect($config['host'], $config['port']);
+                $result->connect($memCacheConfig ['host'], $memCacheConfig ['port']);
                 return $result;
             }
         }
