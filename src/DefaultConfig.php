@@ -31,7 +31,10 @@ return [
             litepubl\core\events\EventManagerInterface::class => litepubl\core\events\Composite::class,
             
             // session
-            LitePubl\Core\Session\SessionInterface::class => LitePubl\Core\Session\Session::class
+            LitePubl\Core\Session\SessionInterface::class => LitePubl\Core\Session\Session::class,
+
+//DB
+LitePubl\Core\DB\AdapterInterface::class =>LitePubl\Core\DB\MySql::class,
         ],
         
         'factories' => [
@@ -65,11 +68,44 @@ return [
             litepubl\core\events\Callbacks::class => EventsFactory::class,
             litepubl\core\events\Composite::class => EventsFactory::class,
             litepubl\core\events\Events::class => EventsFactory::class,
-            litepubl\core\events\GlobalEvents::class => EventsFactory::class
+            litepubl\core\events\GlobalEvents::class => EventsFactory::class,
+
+//DB
+        LitePubl\Core\DB\MySql::class => DBFactory::class,
+        LitePubl\Core\DB\DB::class => DBFactory::class,
+        LitePubl\Core\DB\PdoAdapter::class => DBFactory::class,
+        \mysqli::class => DBFactory::class,
+        \PDO::class => DBFactory::class,
         
         ],
 
         'args' => [
+/**
+\mysqli::class => [
+'host' => 'localhost' | ini_get("mysqli.default_host"),
+'username' => ini_get("mysqli.default_user"),
+'passwd' => ini_get("mysqli.default_pw"),
+'dbname' => '',
+'port' => null | ini_get("mysqli.default_port"),
+'socket' => nul | ini_get("mysqli.default_socket"),
+
+//to exclude modes such as STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE
+'sql_mode' => null |  'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION',
+],
+*/
+
+/**
+\PDO::class = [
+'dsn' =>   'mysql:host=locahost;dbname=database',
+'username' =>  'login',
+'password' => 'mypassword',
+'options' => [
+      PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
+      PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION       //ERRMODE_WARNING
+      //PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL
+],
+],
+*/
             ],
     ],
 

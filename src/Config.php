@@ -2,6 +2,10 @@
 
 namespace litepubl\core\app\App;
 
+use litepubl\core\container\ContainerInterface;
+use litepubl\core\container\NotFound;
+use LitePubl\Core\Container\DI\ArgsInterface;
+
 class Config
 {
     const DI = 'DI';
@@ -28,5 +32,21 @@ class Config
         }
 
         return $a;
+    }
+
+    public function getArgs(ContainerInterface $container, string $className)
+    {
+        if (isset($this->config[static::DI][static::ARGS][$className])) {
+            $result = $this->config[static::DI][static::ARGS][$className];
+        } else {
+            $args = $container->get(ArgsInterface::class);
+            if ($args->has($className)) {
+                $result = $args->get($className);
+            } else {
+                throw new NotFound($className);
+            }
+        }
+
+        return $result;
     }
 }
