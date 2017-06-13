@@ -4,9 +4,12 @@ namespace LitePubl\Core\App;
 use litepubl\core\container\ContainerInterface;
 use litepubl\core\container\factories\Base;
 use LitePubl\Core\DB\AdapterInterface;
-use LitePubl\Core\DB\MySql;
+use LitePubl\Core\DB\MysqliAdapter;
 use LitePubl\Core\DB\PdoAdapter;
 use LitePubl\Core\DB\DB;
+use LitePubl\Core\DB\EventsInterface;
+use LitePubl\Core\DB\LogEvents;
+use LitePubl\Core\DB\NullEvents;
 use LitePubl\Core\DB\ConnectException;
 use \mysqli;
 use \PDO;
@@ -14,30 +17,53 @@ use \PDO;
 class DBFactory extends Base
 {
     protected $implementations = [
-    AdapterInterface::class => MySql::class,
+    AdapterInterface::class => MysqliAdapter::class,
+    EventsInterface::class => LogEvents::class,
     ];
 
     protected $classMap = [
-    MySql::class => 'createMySql',
+    MysqliAdapter::class => 'createMysqliAdapter',
     PdoAdapter::class => 'createPdoAdapter',
     mysqli::class => 'createMysqli',
         DB::class => 'createDB',
+    LogEvents::class => 'createLogEvents',
+    NullEvents::class => 'createNullEvents',
         ];
 
-    public function createMySql(): MySql
+    public function createMysqliAdapter(): MysqliAdapter
     {
-        return new MySql($this->container->get(mysqli::class));
+        return new MysqliAdapter($this->container->get(mysqli::class));
     }
 
     public function createDB(): DB
     {
-        return new DB($this->container->get(AdapterInterface::class));
+        $adapter = $this->container->get(AdapterInterface::class);
+        $events = $this->container->get(EventsInterface::class);
+
+        $config = $this->container->get(Config::class);
+        $options = $config->getArgs($this->container, DB::class);
+
+        return new DB($adapter, $events, $options['prefix']);
     }
 
     public function createPdoAdapter(): PdoAdapter
     {
         return new PdoAdapter($this->container->get(PDO::class));
     }
+
+    public function createLogEvents(): LogEvents
+    {
+        $config = $this->container->get(Config::class);
+        $options = $config->getArgs($this->container, LogEvents::class);
+
+        return new LogEvents($options['format'] ?? null, $options['summaryFormat'] ?? null);
+    }
+
+    public function createnullEvents(): NullEvents
+    {
+        return new NullEvents();
+    }
+
     public function createMysqli(): mysqli
     {
         $config = $this->container->get(Config::class);

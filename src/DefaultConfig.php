@@ -34,7 +34,8 @@ return [
             LitePubl\Core\Session\SessionInterface::class => LitePubl\Core\Session\Session::class,
 
 //DB
-LitePubl\Core\DB\AdapterInterface::class =>LitePubl\Core\DB\MySql::class,
+LitePubl\Core\DB\AdapterInterface::class =>LitePubl\Core\DB\MysqliAdapter::class,
+LitePubl\Core\DB\EventsInterface::class =>LitePubl\Core\DB\LogEvents::class,
         ],
         
         'factories' => [
@@ -71,15 +72,20 @@ LitePubl\Core\DB\AdapterInterface::class =>LitePubl\Core\DB\MySql::class,
             litepubl\core\events\GlobalEvents::class => EventsFactory::class,
 
 //DB
-        LitePubl\Core\DB\MySql::class => DBFactory::class,
+        LitePubl\Core\DB\MysqliAdapter::class => DBFactory::class,
         LitePubl\Core\DB\DB::class => DBFactory::class,
         LitePubl\Core\DB\PdoAdapter::class => DBFactory::class,
+        LitePubl\Core\DB\LogEvents::class => DBFactory::class,
+        LitePubl\Core\DB\NullEvents::class => DBFactory::class,
         \mysqli::class => DBFactory::class,
         \PDO::class => DBFactory::class,
-        
-        ],
+                ],
 
         'args' => [
+        LitePubl\Core\DB\DB::class => [
+        'prefix' => 'cms_',
+        ],
+
 /**
 \mysqli::class => [
 'host' => 'localhost' | ini_get("mysqli.default_host"),
