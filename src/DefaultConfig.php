@@ -36,6 +36,9 @@ return [
 //DB
 LitePubl\Core\DB\AdapterInterface::class =>LitePubl\Core\DB\MysqliAdapter::class,
 LitePubl\Core\DB\EventsInterface::class =>LitePubl\Core\DB\LogEvents::class,
+
+//Mailer
+LitePubl\Core\Mailer\MailerInterface::class => LitePubl\Core\Mailer\Mailer::class,
         ],
         
         'factories' => [
@@ -79,6 +82,10 @@ LitePubl\Core\DB\EventsInterface::class =>LitePubl\Core\DB\LogEvents::class,
         LitePubl\Core\DB\NullEvents::class => DBFactory::class,
         \mysqli::class => DBFactory::class,
         \PDO::class => DBFactory::class,
+
+//mailer
+        LitePubl\Core\Mailer\Mailer::class => MailerFactory::class,
+        LitePubl\Core\Mailer\Smtp::class => MailerFactory::class,
                 ],
 
         'args' => [
