@@ -1,34 +1,34 @@
 <?php
-namespace litepubl\core\app;
+namespace LitePubl\Core\app;
 
 return [
     'DI' => [
         'implementations' => [
             // app
-            Psr\Container\ContainerInterface::class => litepubl\core\container\Container,
-            litepubl\core\container\ContainerInterface::class => litepubl\core\container\Container::class,
-            litepubl\core\container\factories\FactoryInterface::class => litepubl\core\container\factories\Items::class,
-            litepubl\core\container\EventsInterface::class => litepubl\core\options\ContainerEvents::class,
+            Psr\Container\ContainerInterface::class => LitePubl\Core\container\Container,
+            LitePubl\Core\Container\ContainerInterface::class => LitePubl\Core\Container\Container::class,
+            LitePubl\Core\Container\Factories\FactoryInterface::class => LitePubl\Core\Container\Factories\Items::class,
+            LitePubl\Core\Container\EventsInterface::class => LitePubl\Core\options\ContainerEvents::class,
             
             // DI
-            litepubl\core\container\DI\DIInterface::class => litepubl\core\container\DI\DI::class,
-            litepubl\core\container\DI\ArgsInterface::class => litepubl\core\options\DIArgs::class,
-            litepubl\core\container\DI\CacheInterface::class => litepubl\core\options\DICache::class,
-            litepubl\core\container\factories\InstallerInterface::class => litepubl\core\container\factories\NullInterface::class,
+            LitePubl\Core\Container\DI\DIInterface::class => LitePubl\Core\Container\DI\DI::class,
+            LitePubl\Core\Container\DI\ArgsInterface::class => LitePubl\Core\options\DIArgs::class,
+            LitePubl\Core\Container\DI\CacheInterface::class => LitePubl\Core\options\DICache::class,
+            LitePubl\Core\Container\Factories\InstallerInterface::class => LitePubl\Core\Container\Factories\NullInterface::class,
             
             // storages
-            litepubl\core\storage\StorageInterface::class => litepubl\core\storage\Storage::class,
-            litepubl\core\storage\PoolInterface::class => litepubl\core\storage\Pool::class,
-            litepubl\core\storage\LockerInterface::class => litepubl\core\storage\FileLocker::class,
-            litepubl\core\storage\serializer\SerializerInterface::class => litepubl\core\storage\serializer\Php::class,
+            LitePubl\Core\storage\StorageInterface::class => LitePubl\Core\storage\Storage::class,
+            LitePubl\Core\storage\PoolInterface::class => LitePubl\Core\storage\Pool::class,
+            LitePubl\Core\storage\LockerInterface::class => LitePubl\Core\storage\FileLocker::class,
+            LitePubl\Core\storage\serializer\SerializerInterface::class => LitePubl\Core\storage\serializer\Php::class,
             
             // logger
             Psr\Log\LoggerInterface::class => Monolog\Logger::class,
-            litepubl\core\logmanager\LogManagerInterface::class => litepubl\core\logfactory\Manager::class,
-            litepubl\core\logmanager\FactoryInterface::class => litepubl\core\logmanager\LazyFactory::class,
+            LitePubl\Core\LogManager\LogManagerInterface::class => LitePubl\Core\Logger\Manager::class,
+            LitePubl\Core\logmanager\FactoryInterface::class => LitePubl\Core\logmanager\LazyFactory::class,
             
             // events
-            litepubl\core\events\EventManagerInterface::class => litepubl\core\events\Composite::class,
+            LitePubl\Core\events\EventManagerInterface::class => LitePubl\Core\events\Composite::class,
             
             // session
             LitePubl\Core\Session\SessionInterface::class => LitePubl\Core\Session\Session::class,
@@ -43,36 +43,37 @@ LitePubl\Core\Mailer\MailerInterface::class => LitePubl\Core\Mailer\Mailer::clas
         
         'factories' => [
             // app
-            litepubl\core\app\App::class => ContainerFactory::class,
-            litepubl\core\container\Container::class => ContainerFactory::class,
-            litepubl\core\options\ContainerEvents::class => ContainerFactory::class,
+            LitePubl\Core\app\App::class => ContainerFactory::class,
+            LitePubl\Core\Container\Container::class => ContainerFactory::class,
+            LitePubl\Core\options\ContainerEvents::class => ContainerFactory::class,
             
             // DI
-            litepubl\core\container\DI\DI::class => ContainerFactory::class,
-            litepubl\core\options\DIArgs::class => ContainerFactory::class,
-            litepubl\core\options\DICache::class => ContainerFactory::class,
-            litepubl\core\options\Factories::class => ContainerFactory::class,
+            LitePubl\Core\Container\DI\DI::class => ContainerFactory::class,
+            LitePubl\Core\options\DIArgs::class => ContainerFactory::class,
+            LitePubl\Core\options\DICache::class => ContainerFactory::class,
+            LitePubl\Core\options\Factories::class => ContainerFactory::class,
             
             // storage
-            litepubl\core\storage\Storage::class => StorageFactory::class,
-            litepubl\core\storage\Pool::class => StorageFactory::class,
-            litepubl\core\storage\Storage::class => StorageFactory::class,
-            litepubl\core\storage\FileLocker::class => StorageFactory::class,
-            litepubl\core\storage\serializer\Php::class => StorageFactory::class,
-            litepubl\core\storage\serializer\JSon::class => StorageFactory::class,
-            litepubl\core\storage\serializer\Serialize::class => StorageFactory::class,
+            LitePubl\Core\storage\Storage::class => StorageFactory::class,
+            LitePubl\Core\storage\Pool::class => StorageFactory::class,
+            LitePubl\Core\storage\Storage::class => StorageFactory::class,
+            LitePubl\Core\storage\FileLocker::class => StorageFactory::class,
+            LitePubl\Core\storage\serializer\Php::class => StorageFactory::class,
+            LitePubl\Core\storage\serializer\JSon::class => StorageFactory::class,
+            LitePubl\Core\storage\serializer\Serialize::class => StorageFactory::class,
             \MemCache::class => StorageFactory::class,
             LitePubl\Core\Session\Session::class => StorageFactory::class,
             
             // logger
-            litepubl\core\logmanager\LazyFactory::class => StorageFactory::class,
-            litepubl\core\logfactory\Manager::class => litepubl\core\logfactory\Factory::class,
+            LitePubl\Core\logmanager\LazyFactory::class => StorageFactory::class,
+            LitePubl\Core\Logger\Manager::class => LitePubl\Core\Logger\Factory::class,
+        Monolog\Logger::class=> LitePubl\Core\Logger\Factory::class,
             
             // events
-            litepubl\core\events\Callbacks::class => EventsFactory::class,
-            litepubl\core\events\Composite::class => EventsFactory::class,
-            litepubl\core\events\Events::class => EventsFactory::class,
-            litepubl\core\events\GlobalEvents::class => EventsFactory::class,
+            LitePubl\Core\events\Callbacks::class => EventsFactory::class,
+            LitePubl\Core\events\Composite::class => EventsFactory::class,
+            LitePubl\Core\events\Events::class => EventsFactory::class,
+            LitePubl\Core\events\GlobalEvents::class => EventsFactory::class,
 
 //DB
         LitePubl\Core\DB\MysqliAdapter::class => DBFactory::class,
