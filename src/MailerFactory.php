@@ -1,30 +1,52 @@
 <?php
 namespace LitePubl\Core\App;
 
-use litepubl\core\container\ContainerInterface;
-use litepubl\core\container\factories\Base;
+se litepubl\core\container\factories\Base;
 use LitePubl\Core\Mailer\MailerInterface;
 use LitePubl\Core\Mailer\Mailer;
-use LitePubl\Core\Mailer\Smtp;
+use LitePubl\Core\Mailer\AdapterInterface;
+use LitePubl\Core\Mailer\MailAdapter;
+use LitePubl\Core\Mailer\SmtpAdapter;
+use LitePubl\Core\LogManager\LogManagerInterface;
+use \SMTP;
 
-class DBFactory extends Base
+class MailerFactory extends Base
 {
     protected $implementations = [
     MailerInterface::class => Mailer::class,
+    AdapterInterface::class => MailAdapter::class,
     ];
 
     protected $classMap = [
     Mailer::class => 'createMailer',
-    Smtp::class => 'createSmtp',
+    MailAdapter::class => 'createMailAdapter',
+    SmtpAdapter::class => 'createSmtpAdapter',
+    SMTP::class => 'createSmtp',
+
         ];
 
     public function createMailer(): Mailer
     {
-        return new Mailer($this->container->get(mysqli::class));
+        $adapter = $this->container->get(AdapterInterface::class);
+        $logManager = $this->container->get(LogManagerInterface::class);
+
+        return new Mailer($adapter, $logManager);
     }
 
-    public function createSmtp(): Smtp
+    public function createMailAdapter(): MailAdapter
     {
-        return new Smtp();
+        return new MailAdapter($smtp, $account);
+    }
+
+    public function createSmtpAdapter(): SmtpAdapter
+    {
+        $smtp = $this->container->get(SMTP::class);
+
+        return new SmtpAdapter($smtp, $account);
+    }
+
+    public function createSmtp(): SMTP
+    {
+        return new SMTP();
     }
 }
