@@ -38,8 +38,7 @@ LitePubl\Core\DB\AdapterInterface::class =>LitePubl\Core\DB\MysqliAdapter::class
 LitePubl\Core\DB\EventsInterface::class =>LitePubl\Core\DB\LogEvents::class,
 
 //Mailer
-//LitePubl\Core\Mailer\MailerInterface::class => LitePubl\Core\Mailer\Mailer::class,
-LitePubl\Core\Mailer\MailerInterface::class => LitePubl\Core\Options\Mailer::class,
+LitePubl\Core\Mailer\MailerInterface::class => LitePubl\Core\Mailer\Mailer::class,
 LitePubl\Core\Mailer\AdapterInterface::class => LitePubl\Core\Mailer\MailAdapter::class,
         ],
         
@@ -88,7 +87,6 @@ LitePubl\Core\Mailer\AdapterInterface::class => LitePubl\Core\Mailer\MailAdapter
 
 //mailer
         LitePubl\Core\Mailer\Mailer::class => MailerFactory::class,
-        LitePubl\Core\Options\Mailer::class => MailerFactory::class,
         LitePubl\Core\Mailer\MailAdapter::class => MailerFactory::class,
         LitePubl\Core\Mailer\SmtpAdapter::class => MailerFactory::class,
         \SMTP::class => MailerFactory::class,
