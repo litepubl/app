@@ -12,7 +12,7 @@ return [
             
             // DI
             LitePubl\Core\Container\DI\DIInterface::class => LitePubl\Core\Container\DI\DI::class,
-            LitePubl\Core\Container\DI\ArgsInterface::class => LitePubl\Core\options\DIArgs::class,
+            LitePubl\Core\Container\DI\ArgsInterface::class =>             LitePubl\Core\Container\DI\CompositeArgs::class,
             LitePubl\Core\Container\DI\CacheInterface::class => LitePubl\Core\options\DICache::class,
             LitePubl\Core\Container\Factories\InstallerInterface::class => LitePubl\Core\Container\Factories\NullInterface::class,
             
@@ -50,8 +50,11 @@ LitePubl\Core\Mailer\AdapterInterface::class => LitePubl\Core\Mailer\MailAdapter
             
             // DI
             LitePubl\Core\Container\DI\DI::class => ContainerFactory::class,
-            LitePubl\Core\options\DIArgs::class => ContainerFactory::class,
+            LitePubl\Core\Container\DI\Args::class => ContainerFactory::class,
+            LitePubl\Core\Container\DI\CompositeArgs::class => ContainerFactory::class,
+            LitePubl\Core\Container\DI\Cache::class => ContainerFactory::class,
             LitePubl\Core\options\DICache::class => ContainerFactory::class,
+            LitePubl\Core\options\DIArgs::class => ContainerFactory::class,
             LitePubl\Core\options\Factories::class => ContainerFactory::class,
             
             // storage
