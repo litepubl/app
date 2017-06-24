@@ -33,16 +33,14 @@ class ContainerFactory implements FactoryInterface
 
     public function getImplementation(string $className): string
     {
-        $config = $this->config;
-        return $config->config[$config::DI][$config::IMPLEMENTATIONS][$className] ?? '';
+        return $this->config->implementations[$className] ?? '';
     }
 
     public function has($className)
     {
         $className = ltrim($className, '\\');
         $config = $this->config;
-        $factories = $config->config[$config::DI][$config::FACTORIES];
-        return isset($factories[$className]) && ($factories[$className] === get_class($this));
+        return isset($config->factories[$className]) && ($config->factories[$className] === get_class($this));
     }
 
     public function get($className)
@@ -53,67 +51,42 @@ class ContainerFactory implements FactoryInterface
             $className = $newClass;
         }
 
-        if (!$this->has($className)) {
-            $configFactories = $this->config->config[$this->config::DI][$this->config::FACTORIES];
-            if (isset($configFactories[$className])) {
-                        $factoryClass = $configFactories[$className];
-            } else {
-                        throw new NotFound($className);
-            }
+        if ($this->has($className)) {
+            $result = $this->createInstance($className);
+        } else {
+            $result = $this->getFactory($className)->get($className);
+        }
 
-            if ($this->container->has($factoryClass)) {
-                        $factory = $this->container->get($factoryClass);
-            } else {
-                        $factory = new $factoryClass($this->container);
-                        $this->container->set($factory);
-            }
+        return $result;
+    }
 
-            $result = $factory->get($className);
+    protected function getFactory(string $className)
+    {
+            $config = $this->config;
+        if (isset($config->factories[$className])) {
+                $factoryClass = $config->factories[$className];
+        } else {
+                throw new NotFound($className);
+        }
+
+        if ($this->container->has($factoryClass)) {
+                $factory = $this->container->get($factoryClass);
+        } else {
+                $factory = new $factoryClass($this->container);
+                $this->container->set($factory);
+        }
+
+        return $factory;
+    }
+
+    protected function createInstance(string $className)
+    {
+        $name = substr($className, strrpos($className) + 1);
+        $method = 'create' . $name;
+        if (method_exists($this, $method)) {
+            $result = $this->method();
         } else {
             switch ($className) {
-                case App::class:
-                                $result = new $className($this->get(ContainerInterface::class));
-                    break;
-
-                case Container::class:
-                                $result = $this->createContainer();
-                    break;
-
-                case ContainerEvents::class:
-                                $result = $this->createContainerEvents();
-                    break;
-
-                case DI::class:
-                    $result = new $className($this->get(ArgsInterface::class), $this->get(CacheInterface::class));
-                    break;
-
-                case CompositeArgs::class:
-                    $items =[];
-                    $config = $this->config;
-                    foreach ($config[$config::DI][$config::args][$className] as $itemClass) {
-                                        $items[] = $this->get($itemClass);
-                    }
-
-                    $result = new $className(... $items);
-                    break;
-
-                case Args::class:
-                    $result = new $className($this->get(ArgsInterface::class), $this->get(CacheInterface::class));
-                    break;
-
-                case Cache::class:
-                    $result = new $className();
-                    break;
-
-                case DIArgs::class:
-                case DICache::class:
-                    $result = new $className($this->container->get(StorageInterface::class));
-                    break;
-
-                case Factories::class:
-                    $result = new $className($this->container, $this->container->get(PoolInterface::class));
-                    break;
-
                 default:
                     throw NotFound($className);
             }
@@ -122,36 +95,115 @@ class ContainerFactory implements FactoryInterface
         return $result;
     }
 
+    public function createApp(): App
+    {
+        return new App($this->get(ContainerInterface::class));
+    }
+
+    public function createDI(): DI
+    {
+        $args = $this->get(ArgsInterface::class);
+        $cache = $this->get(CacheInterface::class);
+
+        return new DI($args, $cache);
+    }
+
+    public function createCompositeArgs(): CompositeArgs
+    {
+                    $items =[];
+                    $config = $this->config;
+        foreach ($config[$config::DI][$config::args][$className] as $itemClass) {
+                $items[] = $this->get($itemClass);
+        }
+
+        return new CompositeArgs(... $items);
+    }
+
+    public function createArgs(): Args
+    {
+        $config = $this->config;
+
+        return new Args($config->config[$config::ARGS]);
+    }
+
+    public function createCache(): Cache
+    {
+        return new Cache();
+    }
+
+    public function createDIArgs(): DIArgs
+    {
+        $storage = $this->container->get(StorageInterface::class);
+
+        return new DIArgs($storage);
+    }
+
+    public function createDICache(): DICache
+    {
+        $storage = $this->container->get(StorageInterface::class);
+
+        return new DICache($storage);
+    }
+
+    public function createFactories(): Factories
+    {
+        $storage = $this->container->get(PoolInterface::class);
+
+        return new Factories($this->container, $storage);
+    }
+
+    public function createItems(): Items
+    {
+        $config = $this->config;
+
+        return new Items($this->container, $config->factories, $config->implementations);
+    }
+
+    public function createNameSpaceFactory(): NameSpaceFactory
+    {
+        return new NameSpaceFactory($this->container);
+    }
+
+    public function createDIFactory(): DIFactory
+    {
+        $DI = $this->get(DIInterface::class);
+        $this->container->set($DI, 'DI');
+
+        return new DIFactory($this->container, $DI);
+    }
+
     public function createContainer(): Container
     {
         $factories = new Composite();
         $eventManager = new EventsComposite();
         $events = new ContainerEvents($eventManager);
         $config = $this->config;
-        $containerClass =$config->config[$config::DI][$config::IMPLEMENTATIONS][ContainerInterface::class];
+        $containerClass =$config->implementations[ContainerInterface::class];
         $container = new $containerClass($factories, $events);
         $this->container = $container;
         $events->setContainer($container);
         $container->set($config, 'config');
 
-        $factory = new Items($container, $config->config[$config::DI][$config::FACTORIES], $config->config[$config::DI][$config::IMPLEMENTATIONS]);
-        $factories->add($factory);
+        $this->addFactories($container, $factories, $config);
+        $this->addEvents();
+        $this->load();
 
-        $factory = new NameSpaceFactory($container);
-        $factories->add($factory);
-                        $container->set($factory);
+        return $container;
+    }
 
-        $DI = $this->get(DIInterface::class);
-        $container->set($DI, 'DI');
+    protected function addFactories(Composite $factories)
+    {
+        foreach ($config->args[Composite::class] as $className) {
+            $factory = $this->get($className);
+            $factories->add($factory);
+            if (!$this->container->has($className)) {
+                $this->container->set($factory);
+            }
+        }
+    }
 
-        $factory = new DIFactory($container, $DI);
-        $factories->add($factory);
-                        $container->set($factory);
-
-        $factory = $this->get(Factories::class);
-        $factories->addFirst($factory);
-                        $container->set($factory);
-
+    protected function addEvents(Conteaner $continer)
+    {
         $eventManager->add(new Callbacks());
 
         $globalCallbacks = new GlobalCallbacks();

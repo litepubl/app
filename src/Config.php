@@ -8,17 +8,24 @@ use LitePubl\Core\Container\DI\ArgsInterface;
 
 class Config
 {
-    const DI = 'DI';
     const IMPLEMENTATIONS = 'implementations';
     const FACTORIES = 'factories';
     const ARGS = 'args';
     const OPTIONS = 'options';
 
-    public $config;
+    public $args;
+    public $factories;
+    public $implementations;
+    public $options;
 
-    public function __construct(array $defaultConfig, array $config)
+    public function __construct(array $defaultConfig, array $appConfig)
     {
-        $this->config = $this->merge($defaultConfig, $config);
+        $config = $this->merge($defaultConfig, $appConfig);
+
+        $this->args = $config['args'];
+        $this->factories = $config['factories'];
+        $this->implementations = $config['implementations'];
+        $this-.options = $config['options'];
     }
 
     protected function merge(array $a, array $b): array
